@@ -8,9 +8,9 @@
     </appender>
     <appender name="MAIN"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/logs/kafka-opentsdb-basari.log</file>
+        <file>/logs/kafka-flink.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>/logs/kafka-opentsdb-basari.%d{yyyy-MM-dd}.%i.log
+            <fileNamePattern>/logs/kafka-flink.%d{yyyy-MM-dd}.%i.log
             </fileNamePattern>
             <timeBasedFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
