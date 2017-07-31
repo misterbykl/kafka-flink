@@ -13,6 +13,7 @@ import java.util.List;
  * <p>
  * 05/02/2017 16:20
  */
+@SuppressWarnings({"WeakerAccess", "Convert2Lambda"})
 public class TestMain {
     public static void main(String[] args) {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();

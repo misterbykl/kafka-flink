@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--suppress XmlUnboundNsPrefix, XmlUnboundNsPrefix -->
+<configuration>
+
+    <property file="config/application.properties" />
+
+    <logger name="org.hibernate" level="error" />
+    <logger name="org.springframework" level="error" />
+    <logger name="org.apache.catalina.core" level="error" />
+    <logger name="springfox.documentation" level="error" />
+    <logger name="com.zaxxer.hikari" level="error" />
+    <logger name="org.apache.kafka" level="error" />
+    <logger name="etm.core.monitor" level="error" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SIZE_AND_TIME_BASED_FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${logging.path}/${logging.file}.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${logging.path}/${logging.file}.%d{yyyy-MM-dd}.%i.log
+            </fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>1</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{dd.MM.yyyy HH:mm:ss.SSS} %relative [%thread] %-5level
+                %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Setting the root level of logging to INFO -->
+    <root level="info">
+        <appender-ref ref="SIZE_AND_TIME_BASED_FILE" />
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

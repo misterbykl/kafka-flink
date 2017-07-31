@@ -1,12 +1,17 @@
 package stream.input.kafka;
 
-import config.kafka.ConsumerConfig;
+import json.JsonTemplate;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
-import service.Service;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import stream.process.flink.Processor;
+import util.ExceptionUtil;
+import util.StringUtil;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,13 +21,22 @@ import java.util.List;
  * <p>
  * 5/2/17 15:55
  */
+@SuppressWarnings({"CanBeFinal", "unused"})
 public class Consumer {
     private List<String> topicList;
 
     @Autowired
     private KafkaConsumer<String, String> consumer;
     @Autowired
-    private Service service;
+    private JsonTemplate jsonTemplate;
+    @Autowired
+    private Processor processor;
+    @Autowired
+    private
+    @Qualifier("threadPoolTaskExecutor")
+    ThreadPoolTaskExecutor taskExecutor;
+    @Autowired
+    private Logger logger;
 
 
     /**
@@ -39,9 +53,9 @@ public class Consumer {
         this.topicList = Arrays.asList(topics.split(","));
         this.consumer = consumer;
         this.consumer.subscribe(this.topicList);
-        String server = System.getProperties().getProperty(ConsumerConfig.CONSUMER_BOOTSTRAP_SERVERS);
-        String group = System.getProperties().getProperty(ConsumerConfig.GROUP_ID);
-        System.out.println("Kafka consumer started. - Server: " + server + ", Group: " + group + ". Topics: " + topics);
+        String server = System.getProperties().getProperty("bootstrap.servers");
+        String group = System.getProperties().getProperty("group.id");
+        this.logger.info("Kafka consumer started. - Server: " + server + ", Group: " + group + ". Topics: " + topics);
     }
 
     /**
@@ -53,13 +67,19 @@ public class Consumer {
      */
     @Scheduled(fixedDelayString = "10")
     public void consume() {
-        ConsumerRecords<String, String> records = consumer.poll(0);
-        if (!records.isEmpty()) {
-            for (ConsumerRecord<String, String> record : records) {
-                if (this.getTopicList().get(0).equals(record.topic())) {
-                    this.service.manageKafka(record.value());
+        try {
+            ConsumerRecords<String, String> records = this.consumer.poll(0);
+            if (!records.isEmpty()) {
+                for (ConsumerRecord<String, String> record : records) {
+                    if (record.value() != null) {
+                        Runnable thread = new ConsumerThread(this.getTopicList(), processor, record, jsonTemplate);
+                        this.taskExecutor.execute(thread);
+                    }
                 }
             }
+        } catch (Exception e) {
+            this.logger.error(StringUtil.append("ERROR while consuming Kafka message"));
+            ExceptionUtil.getStackTraceString(e, "consume");
         }
     }
 
@@ -72,5 +92,44 @@ public class Consumer {
      */
     private List<String> getTopicList() {
         return this.topicList;
+    }
+
+    /**
+     * The type Consumer thread.
+     * <p>
+     * misterbykl
+     * <p>
+     * 31/07/17 11:57
+     */
+    @SuppressWarnings("unused")
+    private class ConsumerThread implements Runnable {
+        ConsumerRecord<String, String> record;
+        Processor processor;
+        List<String> topicList;
+        JsonTemplate jsonTemplate;
+
+        /**
+         * Instantiates a new Consumer thread.
+         *
+         * @param argTopicList the arg topic list
+         * @param argProcessor the arg processor
+         * @param argValue     the arg value
+         * @param jsonTemplate <b>Created at</b> 12 Haz 2017 17:43
+         * @author emreb
+         * @since 3.0.0
+         */
+        ConsumerThread(List<String> argTopicList, Processor argProcessor, ConsumerRecord<String, String> argValue, JsonTemplate jsonTemplate) {
+            this.record = argValue;
+            this.topicList = argTopicList;
+            this.processor = argProcessor;
+            this.jsonTemplate = jsonTemplate;
+        }
+
+        @Override
+        public void run() {
+            if (this.topicList.get(0).equals(record.topic())) {
+                this.processor.process(this.jsonTemplate.createJsonArray(record.value()));
+            }
+        }
     }
 }

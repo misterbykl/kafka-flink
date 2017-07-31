@@ -10,6 +10,7 @@ import java.util.Map;
  * <p>
  * 05/02/2017 14:24
  */
+@SuppressWarnings({"ALL", "unused"})
 public class JsonDeserializer<T> implements Deserializer<T> {
 
     private Gson gson = new Gson();
@@ -41,12 +42,10 @@ public class JsonDeserializer<T> implements Deserializer<T> {
         if (data == null) {
             return null;
         }
-
         return gson.fromJson(new String(data), deserializedClass);
     }
 
     @Override
     public void close() {
-
     }
 }

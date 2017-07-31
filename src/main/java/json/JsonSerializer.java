@@ -11,13 +11,13 @@ import java.util.Map;
  * <p>
  * 05/02/2017 14:24
  */
+@SuppressWarnings({"WeakerAccess", "CanBeFinal", "unused"})
 public class JsonSerializer<T> implements Serializer<T> {
 
     private Gson gson = new Gson();
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {
-
     }
 
     @Override
@@ -27,6 +27,5 @@ public class JsonSerializer<T> implements Serializer<T> {
 
     @Override
     public void close() {
-
     }
 }
