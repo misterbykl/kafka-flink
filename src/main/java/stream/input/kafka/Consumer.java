@@ -7,6 +7,7 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import stream.process.flink.Processor;
@@ -24,9 +25,14 @@ import java.util.List;
 @SuppressWarnings({"CanBeFinal", "unused"})
 public class Consumer {
     private List<String> topicList;
-
-    @Autowired
     private KafkaConsumer<String, String> consumer;
+
+    @Value("${kafka.bootstrap.servers}")
+    private String servers;
+
+    @Value("${kafka.consumer.groupid}")
+    private String group;
+
     @Autowired
     private JsonTemplate jsonTemplate;
     @Autowired
@@ -53,9 +59,6 @@ public class Consumer {
         this.topicList = Arrays.asList(topics.split(","));
         this.consumer = consumer;
         this.consumer.subscribe(this.topicList);
-        String server = System.getProperties().getProperty("bootstrap.servers");
-        String group = System.getProperties().getProperty("group.id");
-        this.logger.info("Kafka consumer started. - Server: " + server + ", Group: " + group + ". Topics: " + topics);
     }
 
     /**

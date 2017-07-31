@@ -5,9 +5,13 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -28,6 +32,8 @@ import java.util.concurrent.Executors;
 @SuppressWarnings("unused")
 @Configuration
 @EnableScheduling
+@EnableAsync
+@PropertySource(value = {"file:conf/application.properties"})
 public class MainConfig implements SchedulingConfigurer {
 
     private int threadSize = 10;
@@ -46,7 +52,7 @@ public class MainConfig implements SchedulingConfigurer {
      * <p>
      * 31/07/2017 14:12
      */
-    @Bean
+    @Bean(name = "logger")
     public Logger logger() {
         return LoggerFactory.getLogger(this.getClass());
     }
@@ -77,10 +83,10 @@ public class MainConfig implements SchedulingConfigurer {
      * 31/07/17 12:05
      */
     @Bean(destroyMethod = "shutdown")
-    public Executor threadPoolTaskExecutor(@Value("${thread.size}") int argThreadSize) {
-        this.threadSize = argThreadSize;
+    public Executor threadPoolTaskExecutor(@Value("${thread.size}") String argThreadSize) {
+        this.threadSize = Integer.parseInt(argThreadSize);
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(argThreadSize);
+        executor.setCorePoolSize(this.threadSize);
         executor.setKeepAliveSeconds(15);
         executor.initialize();
         return executor;
@@ -95,10 +101,10 @@ public class MainConfig implements SchedulingConfigurer {
      * @param fromBeginning          the from beginning
      * @param customGroupId          the custom group id
      * @return the kafka consumer
-     *                     <p>
-     *                     misterbykl
-     *                     <p>
-     *                     31/07/17 11:02
+     * <p>
+     * misterbykl
+     * <p>
+     * 31/07/17 11:02
      */
     @Bean(name = "kafkaConsumer")
     public KafkaConsumer<String, String> createConsumer(
@@ -139,7 +145,9 @@ public class MainConfig implements SchedulingConfigurer {
      * 31/07/17 11:04
      */
     @Bean
-    public Consumer consumer(@Value("${kafka.consumer.topic}") String topics, KafkaConsumer<String, String> consumer) {
+    @DependsOn({"kafkaConsumer", "logger"})
+    public Consumer consumer(@Value("${kafka.consumer.topic}") String topics,
+                             @Qualifier("kafkaConsumer") KafkaConsumer<String, String> consumer) {
         return new Consumer(topics, consumer);
     }
 
@@ -150,10 +158,10 @@ public class MainConfig implements SchedulingConfigurer {
      * @param bootstrapServers       the bootstrap servers
      * @param bootstrapServersEnable the bootstrap servers enable
      * @return the processor
-     *                     <p>
-     *                     misterbykl
-     *                     <p>
-     *                     31/07/17 11:06
+     * <p>
+     * misterbykl
+     * <p>
+     * 31/07/17 11:06
      */
     @Bean
     public Processor processor(@Value("${kafka.producer.topic}") String topics,
@@ -185,8 +193,8 @@ public class MainConfig implements SchedulingConfigurer {
      * 31/07/17 11:07
      */
     @Bean
-    public JsonTemplate jsonTemplate() {
-        return new JsonTemplate(System.getProperties().getProperty("kafka.seperator"));
+    public JsonTemplate jsonTemplate(@Value("${kafka.seperator}") String seperator) {
+        return new JsonTemplate(seperator);
     }
 
     /**

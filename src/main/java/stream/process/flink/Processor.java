@@ -64,8 +64,7 @@ public class Processor {
             this.streamExecutionEnvironment.fromCollection(data)
                     .flatMap(new TuplesFlatMapFunction())
                     .keyBy(0)
-                    .filter(new FilteredMeterFunction())
-                    .filter(new FilteredValueFunction())
+                    .filter(new FilterFunction())
                     .map(new ResultMapFunction())
                     .addSink(new FlinkKafkaProducer09<>(this.getTopicList().get(0), new SimpleStringSchema(), this.properties));
 
@@ -73,60 +72,6 @@ public class Processor {
         } catch (Exception e) {
             this.logger.error(StringUtil.append("ERROR while procession message with Flink"));
             ExceptionUtil.getStackTraceString(e, "process");
-        }
-    }
-
-    /**
-     * The type Result map function.
-     * <p>
-     * misterbaykal
-     * 31/07/2017 14:21
-     */
-    private class ResultMapFunction extends RichMapFunction<Tuple5<String, String, String, String, String>, String> {
-
-        @Override
-        public String map(Tuple5<String, String, String, String, String> filteredMetricTuple5) throws Exception {
-            return filteredMetricTuple5.f1 + "," + filteredMetricTuple5.f0 +
-                    "," + filteredMetricTuple5.f3 + "," + "isgreaterthan" + "," + filteredMetricTuple5.f4 +
-                    "," + filteredMetricTuple5.f2;
-        }
-    }
-
-    /**
-     * The type Filtered value function.
-     * <p>
-     * misterbaykal
-     * 31/07/2017 14:21
-     */
-    private class FilteredValueFunction extends RichFilterFunction<Tuple5<String, String, String, String, String>> {
-        @Override
-        public boolean filter(Tuple5<String, String, String, String, String> memberTuple5) throws Exception {
-            Double value = Double.valueOf(memberTuple5.f2);
-            Double ruleValue = Double.valueOf(memberTuple5.f4);
-            return value >= ruleValue;
-        }
-    }
-
-    /**
-     * The type Filtered meter function.
-     * <p>
-     * misterbaykal
-     * 31/07/2017 14:21
-     */
-    private class FilteredMeterFunction extends RichFilterFunction<Tuple5<String, String, String, String, String>> {
-        @Override
-        public boolean filter(Tuple5<String, String, String, String, String> filteredValueTuple5) throws Exception {
-            boolean retVal = false;
-            String[] ruleArray = filteredValueTuple5.f4.split(";");
-            final String meterMetric = filteredValueTuple5.f0 + filteredValueTuple5.f3;
-            for (String aRuleArray : ruleArray) {
-                if (aRuleArray.contains(meterMetric)) {
-                    String[] rule = aRuleArray.split("=");
-                    filteredValueTuple5.f4 = rule[1];
-                    retVal = true;
-                }
-            }
-            return retVal;
         }
     }
 
@@ -139,8 +84,41 @@ public class Processor {
     private class TuplesFlatMapFunction implements FlatMapFunction<String, Tuple5<String, String, String, String, String>> {
         @Override
         public void flatMap(String s, Collector<Tuple5<String, String, String, String, String>> collector) throws Exception {
-            String[] stringArrayId = s.split(" ");
+            String[] stringArrayId = s.split(":");
             collector.collect(new Tuple5<>(stringArrayId[0], stringArrayId[1], stringArrayId[2], stringArrayId[3], stringArrayId[4]));
+        }
+    }
+    /**
+     * The type Filtered meter function.
+     * <p>
+     * misterbaykal
+     * 31/07/2017 14:21
+     */
+    private class FilterFunction extends RichFilterFunction<Tuple5<String, String, String, String, String>> {
+        @Override
+        public boolean filter(Tuple5<String, String, String, String, String> filteredValueTuple5) throws Exception {
+            for (int i = 0; i < 5; i++) {
+                if (filteredValueTuple5.getField(i).equals("2")) {
+                    filteredValueTuple5.setField("Baykal", i);
+                }
+            }
+            return true;
+        }
+    }
+
+    /**
+     * The type Result map function.
+     * <p>
+     * misterbaykal
+     * 31/07/2017 14:21
+     */
+
+    private class ResultMapFunction extends RichMapFunction<Tuple5<String, String, String, String, String>, String> {
+        @Override
+        public String map(Tuple5<String, String, String, String, String> filteredMetricTuple5) throws Exception {
+            return filteredMetricTuple5.f0 + "--" + filteredMetricTuple5.f1 +
+                    "--" + filteredMetricTuple5.f2 + "--" + filteredMetricTuple5.f3 +
+                    "--" + filteredMetricTuple5.f4;
         }
     }
 
