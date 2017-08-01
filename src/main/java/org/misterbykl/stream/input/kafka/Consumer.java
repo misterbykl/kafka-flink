@@ -1,6 +1,6 @@
-package stream.input.kafka;
+package org.misterbykl.stream.input.kafka;
 
-import json.JsonTemplate;
+import org.misterbykl.json.JsonTemplate;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import stream.process.flink.Processor;
-import util.ExceptionUtil;
-import util.StringUtil;
+import org.misterbykl.stream.process.flink.Processor;
+import org.misterbykl.util.ExceptionUtil;
+import org.misterbykl.util.StringUtil;
 
 import java.util.Arrays;
 import java.util.List;

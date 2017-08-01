@@ -2,11 +2,10 @@
 <!--suppress XmlUnboundNsPrefix, XmlUnboundNsPrefix -->
 <configuration>
 
-    <property file="config/application.properties" />
+    <property file="org.misterbykl.config/application.properties" />
 
     <logger name="org.hibernate" level="error" />
     <logger name="org.springframework" level="error" />
-    <logger name="org.apache.catalina.core" level="error" />
     <logger name="springfox.documentation" level="error" />
     <logger name="com.zaxxer.hikari" level="error" />
     <logger name="org.apache.kafka" level="error" />

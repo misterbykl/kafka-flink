@@ -1,4 +1,4 @@
-package json;
+package org.misterbykl.json;
 
 
 /**
@@ -41,7 +41,7 @@ public class JsonTemplate {
     }
 
     /**
-     * Create json array string [ ].
+     * Create org.misterbykl.json array string [ ].
      *
      * @param value the value
      * @return the string [ ]

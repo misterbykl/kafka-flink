@@ -1,4 +1,4 @@
-package stream.process.flink;
+package org.misterbykl.stream.process.flink;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.RichFilterFunction;
@@ -10,8 +10,8 @@ import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import util.ExceptionUtil;
-import util.StringUtil;
+import org.misterbykl.util.ExceptionUtil;
+import org.misterbykl.util.StringUtil;
 
 import java.util.*;
 
@@ -50,7 +50,7 @@ public class Processor {
     /**
      * Process.
      *
-     * @param jsonArray the json array
+     * @param jsonArray the org.misterbykl.json array
      *                  <p>
      *                  misterbaykal
      *                  <p>

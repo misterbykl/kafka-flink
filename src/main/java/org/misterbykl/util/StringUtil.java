@@ -1,4 +1,4 @@
-package util;
+package org.misterbykl.util;
 
 /**
  * misterbykl

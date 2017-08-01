@@ -5,7 +5,7 @@ This is a quick and very simple demo for kafka-flink integration.
 
 By default, the app waits for the input data like this: `1:2:3:4:5,2:3:4:5:6,3:4:5:6:7`
 
-After entering the input, the app simply checks if the stream consists number '2' and change it with 'Baykal' string
+After entering the input, the app simply checks if the org.misterbykl.stream consists number '2' and change it with 'Baykal' string
 
 Output: 
 
@@ -21,7 +21,7 @@ Following tools is needed for running the project.
     `wget http://ftp.itu.edu.tr/Mirror/Apache/kafka/0.10.0.0/kafka_2.11-0.10.0.0.tgz`
 2. Extract: `tar xf kafka_2.11-0.10.0.0.tgz`
 3. Change name to kafka1: `mv kafka_2.11-0.10.0.0 kafka1`
-4. Edit 'server.properties' file under 'config' folder for kafka. Fields that need to be changed are listed in the next section
+4. Edit 'server.properties' file under 'org.misterbykl.config' folder for kafka. Fields that need to be changed are listed in the next section
 5. Create 2 more instances: `cp -r kafka1 kafka2` and `cp -r kafka1 kafka3`
 6. Create zookeeper instance: `cp -r kafka1 zookeeper`
 ## Flink

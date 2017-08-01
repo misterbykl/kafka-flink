@@ -1,4 +1,4 @@
-package json;
+package org.misterbykl.json;
 
 import com.google.gson.Gson;
 import org.apache.kafka.common.serialization.Deserializer;

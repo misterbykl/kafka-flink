@@ -1,6 +1,6 @@
-package config;
+package org.misterbykl.config;
 
-import json.JsonTemplate;
+import org.misterbykl.json.JsonTemplate;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.slf4j.Logger;
@@ -16,8 +16,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import stream.input.kafka.Consumer;
-import stream.process.flink.Processor;
+import org.misterbykl.stream.input.kafka.Consumer;
+import org.misterbykl.stream.process.flink.Processor;
 
 import javax.annotation.PreDestroy;
 import java.util.Properties;
@@ -184,9 +184,9 @@ public class MainConfig implements SchedulingConfigurer {
     }
 
     /**
-     * Json template json template.
+     * Json template org.misterbykl.json template.
      *
-     * @return the json template
+     * @return the org.misterbykl.json template
      * <p>
      * misterbykl
      * <p>
